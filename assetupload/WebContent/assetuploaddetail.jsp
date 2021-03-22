@@ -1,0 +1,359 @@
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+<%@page import="java.io.OutputStream"%>   
+<%@ page import="java.io.*"%>
+<%@ page import="java.util.*"%>
+<%@ page import="javax.servlet.*"%>
+ 
+<%@ page import="java.time.format.DateTimeFormatter"%>
+<%@ page import="java.time.*"%>
+
+
+<% 
+  	String title =  "FIS Asset Upload Detail Report Page"; 
+	ArrayList<String> list = new ArrayList<String>();
+	ArrayList<String> tokens = new ArrayList<String>();
+	String formUrl =  (String) session.getAttribute("formUrl");
+	HashMap<String, String> dataMap = new HashMap<String, String>();
+	List<Map<String , String>> rowMap  = new ArrayList<Map<String,String>>();
+	
+	rowMap = (List<Map<String , String>>)  session.getAttribute("rowMap");
+
+	
+	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS");  
+	LocalDateTime now = null;
+	
+	//System.out.println("*** (jsp)rmapSZ=" + rowMap.size());
+	
+%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title><%=title%></title>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.9.1/jquery.tablesorter.min.js"></script>
+<script type="text/javascript" src="includes/js/tableFilter.js"></script>
+
+<style><%@include file="includes/css/header.css"%></style>
+<style><%@include file="includes/css/reports.css"%></style>
+<link rel="stylesheet" href="includes/css/calendar.css" />
+<style><%@include file="includes/css/table.css"%></style>
+
+
+<!-- 
+
+<style><%@include file="includes/css/table.css"%></style>
+
+ 
+
+ -->
+
+
+
+<!-- ******************************************************************************************************************************************************** -->
+<style>
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  width: 150%;
+
+  overflow-y: scroll;
+  border: 1px solid #ddd;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even){background-color: #f2f2f2}
+</style>
+<!-- ******************************************************************************************************************************************************** -->
+<script>
+
+$(function() {
+
+  // call the tablesorter plugin
+  $("table").tablesorter({
+    theme: 'blue',
+    // initialize zebra striping of the table
+    widgets: ["zebra"],
+    // change the default striping class names
+    // updated in v2.1 to use widgetOptions.zebra = ["even", "odd"]
+    // widgetZebra: { css: [ "normal-row", "alt-row" ] } still works
+    widgetOptions : {
+      zebra : [ "normal-row", "alt-row" ]
+    }
+  });
+
+});	
+			
+    </script>
+    
+   <script>
+  function openWin(myID) {
+  
+  
+   myID2 = document.getElementById(b_app).value;
+
+  alert("ID" + myID2);
+  //window.open("http://cvyhj3a27:8181/fisAssetServlet/readxml?appID=" + myID2);
+	}
+	
+	
+	var call = function(id){
+		var myID = document.getElementById(id).value;
+		//alert("****** myID=" + myID + " ID=" + id);
+		//window.open("http://cvyhj3a27:8181/fisAssetServlet/readxml?appID=
+		window.open("http://localhost:8181/webreport/getquote?appKey=" + myID);
+				
+				
+	}
+
+
+
+	var getExcel = function(urlValue){
+		var formUrl = document.getElementById(urlValue).value;
+		//alert("SD=" + startDate + "****** formUrl=" + formUrl + " \n***** urlValue=" + urlValue);
+		//alert("in Quote" + myID + " --- id=" +id);
+		window.open( formUrl, 'popUpWindow','height=500,width=800,left=100,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes' );
+	
+	}
+	
+	
+	
+</script> 
+</head>
+<!-- ********************************************************************************************************************************************************* -->
+
+<body>
+
+<div style="padding-left:20px">
+<%@include  file="includes/header.html" %>
+
+<h3><%=title%></h3>
+
+<%!/*****************************************************************************************************************************************************************/
+//String formUrl = null;
+/*************************************************************************************************************************************************************/
+public ArrayList<String> readHeader(String filePath, JspWriter out) throws IOException {
+	
+	ArrayList<String> strArr = new ArrayList<String>();
+	String header = null;
+	BufferedReader reader = null;
+	StringBuilder sb = null;
+	String line = null;
+	try {
+	 	reader = new BufferedReader(new FileReader(filePath));
+    	 sb = new StringBuilder();
+    
+	} catch (FileNotFoundException fex) {
+		fex.printStackTrace();	
+	}
+	try { 
+	    while((line = reader.readLine())!= null){
+	    	//out.println("** L=" + line);
+	    	strArr.add(line);
+	    }	   
+		reader.close();
+	
+	} catch (IOException ioe) {
+		ioe.printStackTrace();
+	}
+	
+	return strArr;	
+}
+/*************************************************************************************************************************************************************/
+public String  buildHeader( JspWriter out, ArrayList<String> hArr   ) throws IOException {
+	
+	String filePath = "C:/Java_Dev/props/headers/assetUploadHdr.txt";
+
+	 //ArrayList<String> hArr = readHeader(filePath, out);
+ 
+	 
+	 
+	String header = "";
+	String style = "b3";
+	//out.println( "<H6> **^^** HDR=" + hArr.size() + "-- hdrArr="   + hdrArr.size() +  "</h6>");
+	
+	
+	//out.println( "<H6> **^^** HDR=" + hArr.size()   +  "</h6>");
+
+	if (hArr.size() > 0) {
+		for (int k = 0; k <hArr.size(); k++) {
+			
+			if (k == 4) {
+				 style = "b3a"; // larger cell
+				//style = "b3";
+			} else {
+				style = "b3";
+			}
+			//header += "<th class=\"b3\" >" + dataArr.get(k) + " </th>";
+			header += "<th class=\" " + style + "  \" >" + hArr.get(k) + " </th>";
+			
+		}
+	}
+	return header;
+	
+}
+/*************************************************************************************************************************************************************/
+	public ArrayList<String> createArrFromHashMap(JspWriter out, List<Map<String, String>> rowMap) throws IOException {
+		ArrayList<String> dataArr = new ArrayList<String>();
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS");
+		LocalDateTime now = null;
+		String s = "";
+		//System.out.println("*** rowMapSZ=" + rowMap.size());
+		 
+		int i = 0;
+		for (Map<String, String> map : rowMap) {
+			//if (i < 2) {
+
+			Map<String, String> treeMap = new TreeMap<>(map);
+			for (Map.Entry<String, String> entry : treeMap.entrySet()) {
+				//System.out.println("*** Key:" + entry.getKey() + " --> Value:" + entry.getValue() + "--");
+				s += entry.getValue() + "^";
+			}
+			
+			dataArr.add(s);
+			s = "";
+			
+			//System.out.println("*****************************************************************************************************");
+			//}
+			//i++;
+		}
+
+		//System.out.println("*** dataArrSZ=" + dataArr.size());
+		 
+		return (dataArr);
+	}
+
+	/*************************************************************************************************************************************************************/
+	public String buildCells(JspWriter out, ArrayList<String> dataArr ) throws IOException {
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS");
+		LocalDateTime now = null;
+		String cells = "";
+		String xDataItem = null;
+		String color1 = "plum";
+		String style1 = "font-family: sans-serif; color: white;";
+		String rowEven = "#D7DBDD";
+		String rowOdd = "AEB6BF";
+		String excel = null;
+		String rowColor = null;
+		int arrSZ = dataArr.size();
+		int tokSZ = -1;
+		String token_list[] = null;
+		 
+		
+		out.println("*** Rows returned: " + dataArr.size() );
+		if (arrSZ > 0) {
+			for (int k = 0; k < arrSZ; k++) {
+				rowColor = (k % 2 == 0) ? rowEven : rowOdd;	
+				
+				xDataItem = dataArr.get(k);
+				
+				//System.out.println("*** SZ=" + dataArr.size() + "-- xdSZ=" + xDataItem.length() + "--");
+			 	token_list = xDataItem.split("\\^");
+			 	
+			 	
+			 	
+			 	tokSZ = token_list.length;
+			 	//System.out.println("tSZ=" + tokSZ + "--\n");
+			 	
+			 	
+			 	for (int x = 0; x < tokSZ; x++) {
+					 //cells += "<td class=\"odd\">" + token_list[x] + "</td>";
+					  
+					 out.println( "<td class=\"odd\">" + token_list[x] + "</td>" );
+					//System.out.print(token_list[x] + ", ");
+				}
+			 	tokSZ = 0;
+			 	 //cells += "</tr >";
+			 	 out.println( "</tr >");
+			 	//System.out.println("\n");
+			}
+			
+			
+		}
+
+		return cells;
+	}
+	
+	/*************************************************************************************************************************************************************/
+
+	
+	public String buildCells_OLD(JspWriter out, ArrayList<String> dataArr ) throws IOException {
+		String cells = "";
+		return cells;
+	}%>
+
+
+
+
+ 
+<%  
+/*****************************************************************************************************************************************************************/
+
+
+	//String filePath = "C:\\Java_Dev\\props\\headers\\assetUploadHdr.txt";
+String filePath = "C:/Java_Dev/props/headers/assetUploadHdr.txt";
+
+	 ArrayList<String> headerArr = readHeader(filePath, out);
+  
+
+//out.println("** hdrfile=" + filePath  + "-- hSZ=" + headerArr.size() + "--");
+	
+	 
+	//list2.add("xx");
+	
+	//out.println("listSize=" + list.size());
+	if (rowMap.size() > 0) {
+		
+		%>
+	<div style="height: 500px; overflow: auto;">
+
+	<!--  
+<input id="search" type="text" placeholder="Enter Text to Filter...">
+-->			
+		
+		<%  
+		
+		/**********************************************************************************************************************************************************/
+		// Output Table 
+	
+	 
+		out.println("<table  border=\"1\"> <thead> <tr>");
+		String header = buildHeader(out, headerArr); // build header from file
+		out.println(header);
+		out.println("</tr></thead>");
+		out.println("<tbody id=\"report\">");
+		list = createArrFromHashMap(out, rowMap);
+	 	String cells =  buildCells(out, list); // build data cells from file
+ 		 //out.println(cells);
+		out.println("</tbody></table>"); // Close Table
+	out.flush();
+		 /*
+		out.println("<table class=\"tablesorter\" border=\"1\"> <thead> <tr>");
+		String header = buildHeader(out, headerArr); // build header from file
+		out.println(header);
+		out.println("</tr></thead>");
+		out.println("<tbody id=\"report\">");
+		String cells =  buildCells(out, list); // build data cells from file
+		out.println(cells);
+		out.println("</tbody></table>"); // Close Table
+		 */
+		 
+		 
+		
+	}
+%>	
+</div>
+
+<!-- 
+		<input id="search" type="text" placeholder="Enter Text to Filter...">
+  -->
+
+
+
+</body>
+</html>

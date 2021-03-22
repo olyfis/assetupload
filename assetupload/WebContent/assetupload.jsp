@@ -38,7 +38,7 @@ http://cvyhj3a27:8181/nbvaupdate/nbvaupdate?id=101-0010311-004&eDate=2020-03-10&
     <script type="text/javascript" src="includes/scripts/pureJSCalendar.js"></script>
 
 
-
+ 
 
 <script language="javascript" type="text/javascript">
  
@@ -121,76 +121,38 @@ function ajaxFunction(){
 
 
 
+ <h5>Note: <font color="red">This application will process a large data set and may take some time to run.</font> <BR>
  
-</h5>
-
 <BR>
+<!--   ************** Add Forms ********************************************************************************************************************* -->
 
+<form name="actionform" method="get" enctype="multipart/form-data" action="assetup"  name="id"> 
 
-	 
-<form name="actionform" method="get" enctype="multipart/form-data" action="assetup"  > 
 <BR>
 
 
 <table class="a" width="40%"  border="1" cellpadding="1" cellspacing="1">
-<tr> <th class="theader"> <%=title%></th> </tr>
+<tr> <th class="theader"> Olympus FIS Asset Upload Query by Contract ID</th> </tr>
   <tr>
     <td class="table_cell">
     <!--  Inner Table -->
     <table class="a" width="100%"  border="1" cellpadding="1" cellspacing="1">
   <tr>
- 
-  <td width="20" valign="bottom"> <b>Enter Contract Number:</b> </td> 
+  <td width="20" valign="bottom"> <b>Enter Contract ID: (Ex. 101-0016020-001)</b> </td> 
   <td width="20" valign="bottom">  
-     <% // out.println("<input name=\"startDate\" id=\"date2\" type=\"text\" value=\"Click for Calendar\" onclick=\"pureJSCalendar.open('yyyy-MM-dd', 20, 30, 7, '2017-1-1', '2025-12-31', 'date2', 20)\"   />" );
+     <%  out.println("<input name=\"id\" id=\"id\" type=\"text\" value=\"\"   />" );
      %>
-    <!--  <CENTER>  <input name="id" type="text"  value="101-0009442-019" /> </CENTER>  -->
-      <CENTER>  <input name="id" type="text"   /> </CENTER>
-     
   </td>
   </tr>
-
-  <!-- ********************************************************************************************************************************************************* -->
-
-  <!-- ********************************************************************************************************************************************************* -->
-     
-
-      <!-- ********************************************************************************************************************************************************* -->
-  <!--    
-      <tr>
-  <td width="20" valign="bottom"> <b>Select Disposition Code Update File:</b> </td> 
-  <td width="20" valign="bottom">  
-      <CENTER>  <input type="file" name="file" size="25" />
-     
-      </CENTER>
-  </td>
-  </tr>
-  -->   
-     
-     
-     <!-- ********************************************************************************************************************************************************* -->
-     
-     
-     <tr>
-  <td width="20" valign="bottom" COLSPAN="2">  &nbsp</td> 
-   
-  </tr>
   
-  <!-- ********************************************************************************************************************************************************* -->
-  
-  
+
   <tr>
-   <td  valign="bottom" class="a" COLSPAN="2" >
+   <td  valign="bottom" class="a">
 	<div id='ajaxDiv'> </div>
-	<!--  </td>
-	
-	   <td> 
-	  --> 
-	 <CENTER> 
+	</td>
+	 <td> 
     <INPUT type="submit" value="Submit">  
-     <input type="reset" value="Clear"/>
-     </CENTER>
-     </td>  
+    </td>
 	
   </tr>
   </table>
@@ -198,7 +160,53 @@ function ajaxFunction(){
 </table>
 
  </form>
+ <!-- ************ End First Table *************** -->
+ <BR>
+ <form name="actionform" method="get" action="assetup">
+
+<BR>
+
+
+<table class="a" width="40%"  border="1" cellpadding="1" cellspacing="1">
+<tr> <th class="theader"> Olympus FIS Asset Upload Query by Invoice Date</th> </tr>
+  <tr>
+    <td class="table_cell">
+    <!--  Inner Table -->
+    <table class="a" width="100%"  border="1" cellpadding="1" cellspacing="1">
+  <tr>
+  <td width="20" valign="bottom"> <b>Enter Invoice Date: (Ex.2021-03-19)</b> </td> 
+  <td width="20" valign="bottom">  
+     <%  //out.println("<input name=\"appid\" id=\"appid\" type=\"text\" value=\"\"   />" );
+      out.println("<input name=\"date2\" id=\"date2\" type=\"text\" value=\"Click for Calendar\" onclick=\"pureJSCalendar.open('yyyy-MM-dd', 20, 30, 7, '2017-1-1', '2025-12-31', 'date2', 20)\"   />" );
+     
+     %>
+  </td>
+  </tr>
+  
+
+  <tr>
+   <td  valign="bottom" class="a">
+	<div id='ajaxDiv'> </div>
+	</td>
+	 <td> 
+    <INPUT type="submit" value="Submit">  
+    </td>
+	
+  </tr>
+  </table>
+
+</table>
+<!-- ************ End Second Table *************** -->
+ </form>
+ 
+ 
+ </BR>
+
+
+<!--   ************** End  Add Forms **************************************************************************************************************** --> 
+
 <h5>If you require access to the reports, please contact: John.Freeh@olympus.com</h5>
 <h5>Note: <font color="red">Requires Javascript to be enabled.</font> <BR>
+<script type="text/javascript" src="includes/js/validateID.js"></script>
 </body>
 </html>

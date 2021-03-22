@@ -66,9 +66,7 @@ $(function() {
         	 
       },
       
-      id: {    
-          	myFunc: "ID cannot have a 2 in the third position of the contract ID."
-        },
+     
       eDate: {    
         	checkDate: "Date Enter must be later than today."
         },

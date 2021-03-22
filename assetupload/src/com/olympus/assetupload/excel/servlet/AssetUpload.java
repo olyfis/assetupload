@@ -1,11 +1,12 @@
 package com.olympus.assetupload.excel.servlet;
 
- 
+ // Run: http://localhost:8181/assetupload/assetup?id=101-0008740-006
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Handler;
+import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -188,7 +189,18 @@ public class AssetUpload extends HttpServlet {
 		return(tgtArr);
 	}
 	/*****************************************************************************************************************************************************/
-	
+	public static List<Map<String, String>> findDateinData(ArrayList<String> strArr, String date) {
+		ArrayList<String> rtnArr = new ArrayList<String>();
+		 List<Map<String, String>> newMapArr  = new ArrayList<Map<String,String>>();
+		 HashMap<String, String> rMap = new HashMap<String, String>();
+		 
+		 
+		 
+		 System.out.println("*** Query for Date=" + date + "--");
+		 
+		 
+		 return (newMapArr); 
+	}
 
 	/*****************************************************************************************************************************************************/
 
@@ -368,88 +380,202 @@ public class AssetUpload extends HttpServlet {
 	
 	/*****************************************************************************************************************************************************/
 
-	public static void  displayMapArr(HashMap<String, String> mp)  {
-		//int sz = mp.size();
-		//String key = "";
-		//int i = 0;
-		//int ms = 0;
- 	    
-	    // using for-each loop for iteration over Map.entrySet() 
-        for (Map.Entry<String,String> entry : mp.entrySet())   {
-            //System.out.println("Key = " + entry.getKey() +  ", Value = " + entry.getValue());       
-            //int aSz = entry.getValue().size();
-           // System.out.println("Key = " + entry.getKey() +  ", Value = " + aSz);
-            //for( int k = 0; k <aSz; k++) {
-            	//String id = entry.getValue().get(k).getAgreementNum();
-            	//BigDecimal netInvoice = entry.getValue().get(k).getNetInvoice();
-            	//if (k > 0) {
-               	 	//System.out.println("k=" + k + "-- Key = " + entry.getKey() +  "-- ID=" + id + "-- NI="  + netInvoice);
-            	//}   	
-            //}
-     
-        } 
-		    
+	public static void displayMapArr(List<Map<String, String>> rowMap) {
+		int i = 0;
+		for (Map<String, String> map : rowMap) {
+			//if (i < 2) {
+
+				Map<String, String> treeMap = new TreeMap<>(map);
+				for (Map.Entry<String, String> entry : treeMap.entrySet()) {
+					System.out.println("*** Key:" + entry.getKey() + " --> Value:" + entry.getValue() + "--");
+				}
+				//System.out.println("*****************************************************************************************************");
+			//}
+			//i++;
+		}    
 	}
+	
+	/*****************************************************************************************************************************************************/
 
 	/*****************************************************************************************************************************************************/
  
 	// Service method
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-		 String xlsbFileName = "C:\\Java_Dev\\props\\SAP_Upload\\SAP_Asset_Upload\\new asset upload cumulative through current.xlsb";
-		 HashMap<String, String> dataMap = new HashMap<String, String>();
-		 List<Map<String , String>> rowMap  = new ArrayList<Map<String,String>>();
-		 
-		 String contractID = "101-0013515-010";
-		 contractID = "102-0017647-001";
-		 ArrayList<String> strArr = new ArrayList<String>();
-		 ArrayList<String> tgtArr = new ArrayList<String>();
-		//String xlsbFileName =
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		boolean processDate = false;
+		boolean proceed = false;
+		String idParam = "";
+		String processType = "";
+		String xlsbFileName = "C:\\Java_Dev\\props\\SAP_Upload\\SAP_Asset_Upload\\new asset upload cumulative through current.xlsb";
+		HashMap<String, String> dataMap = new HashMap<String, String>();
+		List<Map<String, String>> rowMap = new ArrayList<Map<String, String>>();
+		String dispatchJSP = "/assetuploaddetail.jsp";
+
+		String dispatchJSP_Err = "/assetuperror.jsp";
+		String contractID = "";
+		contractID = ""; // 102-0017647-001
+		ArrayList<String> strArr = new ArrayList<String>();
+		ArrayList<String> tgtArr = new ArrayList<String>();
+		// String xlsbFileName =
 		String sep = "\\^";
 		String[] strSplit = null;
 		String[] ss = null;
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS");  
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS");
 		LocalDateTime now = null;
-		
- 
+		String idVal = "";
+		String dateParam = "";
+
 		String logFileName = "sapAssetUpload.log";
 		String directoryName = "D:/Kettle/logfiles/sapAssetUpload";
-		Handler fileHandler =  OlyLog.setAppendLog(directoryName, logFileName, logger );
-		strArr = readXlsbFile(xlsbFileName);
+		Handler fileHandler = OlyLog.setAppendLog(directoryName, logFileName, logger);
+		String paramName = "id";
+		String paramValue = request.getParameter(paramName);
+		
+		String paramDate2 = request.getParameter("date2");
+		//System.out.println("%%%%%% DATE=" + paramDate2 + "--");
+		
+		/*
+		 * if ( ! Olyutil.isNullStr(paramValue) ){ contractID= paramValue.trim();
+		 * //System.out.println("*** contractID:" + contractID + "--"); } else {
+		 * 
+		 * }
+		 */
 
-		//System.out.println("SZ=" + strArr.size());
-		//Olyutil.printStrArray(strArr);
-		rowMap = findIDinData( strArr, contractID);
-		//Olyutil.printStrArray(tgtArr);
-		
-		Map<String, String> treeMap = new TreeMap<>(dataMap);
-		
-		//for (String str : treeMap.keySet()) {
-		    //System.out.println(str);
-		//}
-		
-		System.out.println("*****************************************************************************************************");
-				
-				
-		//for (Map.Entry<String, String> entry : dataMap.entrySet()) {
-		  // System.out.println("*** Key:" + entry.getKey()+" --> Value:" +entry.getValue() + "--");
-		//}
-	  
-		System.out.println("rmSZ=" + rowMap.size());
-		
-		for (Map<String, String> map : rowMap) {
-			
-			for (Map.Entry<String, String> entry : map.entrySet()) {
-				   System.out.println("*** Key:" + entry.getKey()+" --> Value:" +entry.getValue() + "--");
-			}
-			System.out.println("*****************************************************************************************************");
-			
+		if (request.getParameterMap().containsKey("id")) {
+			 
+			idParam = "id";
+			contractID = request.getParameter(idParam).trim();
+			System.out.println("%%%%%% IDVal=" + contractID + "--");
+			processType = "id";
+
+		} else if (request.getParameterMap().containsKey("date2")) {
+			processDate = true;
+			idParam = "date2";
+			dateParam = request.getParameter(idParam);
+			System.out.println("*****%%%%%% DateParam=" + dateParam + "--");
 		}
+
+		if (processType.equals("id")) { // process contractID
+			
+			// check ID size
+			if (contractID.length() != 15) {
+				System.out.println("%%%%%% ID is not valid -- ID SZ=" + contractID.length());
+				
+				now = LocalDateTime.now();
+				logger.info(dtf.format(now) + ": " + "------------------ Forward to Error JSP: " + dispatchJSP_Err);
+				request.getRequestDispatcher(dispatchJSP_Err).forward(request, response);
+				return;
+			} else {
+				proceed = true;
+				 
+			}
+			
+			
+			
+
+		} else if (processDate) {
+			proceed = true;
+			System.out.println("** Processing date -- PD=" + processDate );
+		} else {
+			
+			System.out.println("** IN Else -- PT=" + processDate );
+		}
+
+		if (proceed) {
+			System.out.println("** Begin reading XLSB");
+			now = LocalDateTime.now();
+			// System.out.println("Begin SQL:" + dtf.format(now));
+			logger.info(dtf.format(now) + ": " + "------------------ Begin reading XLSB file");
+
+			strArr = readXlsbFile(xlsbFileName);
+			now = LocalDateTime.now();
+			// System.out.println("Begin SQL:" + dtf.format(now));
+			logger.info(dtf.format(now) + ": " + "------------------ End reading XLSB file");
+			
+			
+			
+			if (processType.equals("id")) {
+				rowMap = findIDinData(strArr, contractID);
+			} else {
+				logger.info(dtf.format(now) + ": " + "------------------ Begin processing date param");
+				String dateParam_t = Olyutil.formatDate(dateParam,  "yyyy-MM-dd","yyyyMdd");
+				
+				rowMap = findDateinData(strArr, dateParam_t);		
+			}
+		}
+/*
+		now = LocalDateTime.now();
+		// System.out.println("Begin SQL:" + dtf.format(now));
+		logger.info(dtf.format(now) + ": " + "------------------ Begin reading XLSB file");
+
+		strArr = readXlsbFile(xlsbFileName);
+		now = LocalDateTime.now();
+		// System.out.println("Begin SQL:" + dtf.format(now));
+		logger.info(dtf.format(now) + ": " + "------------------ End reading XLSB file");
+
+		// System.out.println("SZ=" + strArr.size());
+		// Olyutil.printStrArray(strArr);
+		 * 
+		 * 
+		 * */
 		
-		 
-		//System.out.println("tgtArrSZ:" + tgtArr.size());
-		System.out.println("** End:");
-	}
 	
+		
+		
+		
+		//rowMap = findIDinData(strArr, contractID);
+		
+		
+		
+		// Olyutil.printStrArray(tgtArr);
+
+		// Map<String, String> treeMap1 = new TreeMap<>(dataMap);
+
+		// for (String str : treeMap.keySet()) {
+		// System.out.println(str);
+		// }
+
+		// System.out.println("*****************************************************************************************************");
+
+		// for (Map.Entry<String, String> entry : dataMap.entrySet()) {
+		// System.out.println("*** Key:" + entry.getKey()+" --> Value:"
+		// +entry.getValue() + "--");
+		// }
+		// System.out.println("rmSZ=" + rowMap.size());
+		// displayMapArr( rowMap) ;
+
+		// System.out.println("tgtArrSZ:" + tgtArr.size());
+		
+		
+		
+		request.getSession().setAttribute("rowMap", rowMap);
+
+		request.getSession().setAttribute(paramName, paramValue);
+		now = LocalDateTime.now();
+		// System.out.println("Begin SQL:" + dtf.format(now));
+		logger.info(dtf.format(now) + ": " + "------------------ Forward to JSP: " + dispatchJSP);
+		LogManager.getLogManager().reset();
+
+		for (Handler h : logger.getHandlers()) {
+			System.out.println("*** Closing loggers");
+			h.close(); // must call h.close or a .LCK file will remain.
+		}
+
+		//request.getRequestDispatcher(dispatchJSP).forward(request, response);
+		// System.out.println("** End:");
+	}
+
+	/*****************************************************************************************************************************************************/
+
+	// Service method
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+	}
+
+	/*****************************************************************************************************************************************************/
+		
 }
 
