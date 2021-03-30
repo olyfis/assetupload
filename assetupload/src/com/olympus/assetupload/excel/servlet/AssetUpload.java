@@ -168,9 +168,15 @@ public class AssetUpload extends HttpServlet {
             	}
             	m++;
             }
-		 if (is != null) {
+   		 if (is != null) {
 			 is.close();
-		 }		
+		 }	
+		 
+		 
+		 if (pkg != null) {
+			 pkg.close();
+		 }	
+		 		
         } catch (InvalidFormatException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -189,17 +195,99 @@ public class AssetUpload extends HttpServlet {
 		return(tgtArr);
 	}
 	/*****************************************************************************************************************************************************/
-	public static List<Map<String, String>> findDateinData(ArrayList<String> strArr, String date) {
+	public static String getDateRows(String s, int n, int sSZ) {
+		String newDateStr = "";
+		String dateCol = "";
+		String idxKey = "P";
+		int lineNo = 0;
+		if (! s.contains("Order Type")) {
+			//System.out.println("^^^ Skip Header");
+			//String[] parts = s.split("\\^");
+			String[] parts = s.split("\\^");
+			
+			int pSZ = parts.length;
+			/* if (n > 175035 && n < 175042) {
+				System.out.println("*** N=" + n + "--pSZ=" + pSZ  +  "-- sSZ=" + sSZ + "-- s=" +s );
+				System.out.println("*** pSZ=" + pSZ + "-- parts[1]=" + parts[1]  +  "--");
+			 }
+			 */
+			 lineNo = n;
+			 /*
+			 if (Olyutil.isNullStr(parts[1])) {
+				 lineNo = n;
+			 } else {
+				 lineNo = new Scanner(parts[1]).useDelimiter("\\D+").nextInt();
+			 }
+			 */
+			idxKey += String.valueOf(lineNo);
+
+			int indexOfSubStr = s.toUpperCase().indexOf(idxKey.toUpperCase());
+			
+			//if (n >9841 && n < 9850) {
+				//.out.println("*** indexOfSubStr=" + indexOfSubStr);
+			//}
+			
+			if (indexOfSubStr > 0) {
+				int nextDelim = s.indexOf('^', indexOfSubStr);
+				String sub = s.substring(indexOfSubStr, nextDelim);
+				String[] id = sub.split("%");
+				dateCol = id[1];
+			} else {
+				dateCol = "";
+			}
+			
+			// System.out.println("*** ID=" + idVal + "-- LN=" + lineNo + "-- idxKey=" +
+			// idxKey + "-- idx=" + indexOfSubStr + "-- sub=" + sub + "--");
+		}
+
+		return (dateCol);
+	}
+	
+	
+	
+	/*****************************************************************************************************************************************************/
+	 public static List<Map<String, String>> findDateinData(ArrayList<String> strArr, String date) {
 		ArrayList<String> rtnArr = new ArrayList<String>();
-		 List<Map<String, String>> newMapArr  = new ArrayList<Map<String,String>>();
-		 HashMap<String, String> rMap = new HashMap<String, String>();
-		 
-		 
-		 
-		 System.out.println("*** Query for Date=" + date + "--");
-		 
-		 
-		 return (newMapArr); 
+		List<Map<String, String>> newMapArr = new ArrayList<Map<String, String>>();
+		HashMap<String, String> rMap = new HashMap<String, String>();
+		int n = 0;
+		int k = 0;
+		String dateVal = "";
+		//System.out.println("*** Query for Date=" + date + "--");
+		int sSZ= strArr.size();
+		for (String s1 : strArr) { // add String to tgtArr
+			if (s1.contains("Order Type") || s1.contains("sheet name")) {
+				// System.out.println("^^^ Skip Header");
+				n++;
+				continue;
+			}
+			
+			dateVal = getDateRows(s1, n, sSZ);
+			/* 
+			 if (n > 170500 && n < 170510) { // debug
+				 System.out.println("***^FID^^*** LNum="  + n + "-- dateVal RTN=" + dateVal + "--");
+			 }
+		 */
+			if ((!Olyutil.isNullStr(dateVal)) && dateVal.equals(date)) {
+			 /*
+				 if (n > 170500 && n < 170510) { // debug 20210119
+					System.out.println("***^^^*** LineNo=" + n + "-- S=" + s1 + "--");
+				 }
+			 */
+				rtnArr.add(s1);
+				rMap = getColData(s1, n);
+				newMapArr.add(k++, rMap);
+			}
+
+			
+			n++;
+			
+			
+			
+
+		}
+
+		return (newMapArr);
 	}
 
 	/*****************************************************************************************************************************************************/
@@ -403,7 +491,9 @@ public class AssetUpload extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		String errCode = "";
 		boolean processDate = false;
+		boolean processID = false;
 		boolean proceed = false;
 		String idParam = "";
 		String processType = "";
@@ -443,47 +533,56 @@ public class AssetUpload extends HttpServlet {
 		 */
 
 		if (request.getParameterMap().containsKey("id")) {
-			 
+			processID = true;
 			idParam = "id";
 			contractID = request.getParameter(idParam).trim();
-			System.out.println("%%%%%% IDVal=" + contractID + "--");
+			//System.out.println("%%%%%% IDVal=" + contractID + "--");
 			processType = "id";
 
 		} else if (request.getParameterMap().containsKey("date2")) {
 			processDate = true;
 			idParam = "date2";
 			dateParam = request.getParameter(idParam);
-			System.out.println("*****%%%%%% DateParam=" + dateParam + "--");
+			//System.out.println("*****%%%%%% DateParam=" + dateParam + "--");
 		}
 
-		if (processType.equals("id")) { // process contractID
+		if (processID) { // process contractID
 			
 			// check ID size
 			if (contractID.length() != 15) {
-				System.out.println("%%%%%% ID is not valid -- ID SZ=" + contractID.length());
-				
+				errCode = "idErr";
+				//System.out.println("***%%%*** ID is not valid -- ID SZ=" + contractID.length());
+				 request.getSession().setAttribute("idErr", errCode);
 				now = LocalDateTime.now();
+				logger.info(dtf.format(now) + ": " + "------------------ ID length error: " + contractID);
 				logger.info(dtf.format(now) + ": " + "------------------ Forward to Error JSP: " + dispatchJSP_Err);
 				request.getRequestDispatcher(dispatchJSP_Err).forward(request, response);
 				return;
 			} else {
 				proceed = true;
 				 
-			}
-			
-			
-			
+			}	
 
 		} else if (processDate) {
+			if (dateParam.length() != 10) {
+				//System.out.println("%%%%%%****%%%%%% date is not valid -- ID SZ=" + dateParam.length());
+				errCode = "dateErr";
+				 request.getSession().setAttribute("dateErr", errCode);
+				now = LocalDateTime.now();
+				logger.info(dtf.format(now) + ": " + "------------------ Date Error: " + dateParam);
+				logger.info(dtf.format(now) + ": " + "------------------ Forward to Error JSP: " + dispatchJSP_Err);
+				request.getRequestDispatcher(dispatchJSP_Err).forward(request, response);
+				return;	
+			}
 			proceed = true;
-			System.out.println("** Processing date -- PD=" + processDate );
+			//System.out.println("** Processing date -- PD=" + processDate );
 		} else {
 			
-			System.out.println("** IN Else -- PT=" + processDate );
+			//System.out.println("** IN Else -- PT=" + processDate );
 		}
 
 		if (proceed) {
-			System.out.println("** Begin reading XLSB");
+			//System.out.println("** Begin reading XLSB");
 			now = LocalDateTime.now();
 			// System.out.println("Begin SQL:" + dtf.format(now));
 			logger.info(dtf.format(now) + ": " + "------------------ Begin reading XLSB file");
@@ -499,7 +598,7 @@ public class AssetUpload extends HttpServlet {
 				rowMap = findIDinData(strArr, contractID);
 			} else {
 				logger.info(dtf.format(now) + ": " + "------------------ Begin processing date param");
-				String dateParam_t = Olyutil.formatDate(dateParam,  "yyyy-MM-dd","yyyyMdd");
+				String dateParam_t = Olyutil.formatDate(dateParam,  "yyyy-MM-dd","yyyyMMdd");
 				
 				rowMap = findDateinData(strArr, dateParam_t);		
 			}
@@ -562,7 +661,10 @@ public class AssetUpload extends HttpServlet {
 			h.close(); // must call h.close or a .LCK file will remain.
 		}
 
-		//request.getRequestDispatcher(dispatchJSP).forward(request, response);
+		
+		
+		fileHandler.close();
+		 request.getRequestDispatcher(dispatchJSP).forward(request, response);
 		// System.out.println("** End:");
 	}
 

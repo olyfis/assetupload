@@ -3,11 +3,14 @@
 <%@ page import="java.io.*"%>
 <%@ page import="java.util.*"%>
 <%@ page import="javax.servlet.*"%>
- 
+
+<%@ page import="com.olympus.olyutil.Olyutil"%> 
 
 <%   	String title =  "Olympus FIS Asset Upload Report Error Page"; 
+String dateErr =  (String) session.getAttribute("dateErr");
 	
-	
+String idErr =  (String) session.getAttribute("idErr");
+ 
 	
 %>
 
@@ -115,16 +118,23 @@ $(function() {
    
    
 			<div style="height: 450px; overflow: auto;">
-				
+		<% 			
+		//out.println("<br><h5>idErr="   +  idErr +    "-- </h5><br>");
+		//out.println("<br><h5>dateErr="   +  dateErr +    "-- </h5><br>");
+
+	 
 		
+		if (! Olyutil.isNullStr(dateErr) && dateErr.equals("dateErr")) {
+			out.println("<br><h5>An Error occurred. Please re-submit vith a valid Date. (ex. 2021-03-19) </h5><br>");
 
-
-		<%  
-		out.println("<br><h5>An Error occurred. Please re-submit vith a valid Contract ID. (ex. 101-0008740-006) </h5><br>");
+		} else if (! Olyutil.isNullStr(idErr) & idErr.equals("idErr")) {
+			out.println("<br><h5>An Error occurred. Please re-submit vith a valid Contract ID. (ex. 101-0008740-006) </h5><br>");
+		}
 		/**********************************************************************************************************************************************************/
 		// Output Table 
 	
-	 
+	  request.getSession().setAttribute("dateErr", "");
+	  request.getSession().setAttribute("idErr", "");
 		
 %>	
 </div>

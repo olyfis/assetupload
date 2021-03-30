@@ -116,7 +116,7 @@ function ajaxFunction(){
 
 <BR>
 <h5>This page will provide an on-demand list of contract details from the Asset Upload spreadsheet.</h5>
-<h5>Enter a valid contract ID.</h5>
+<h5>Enter a valid contract ID or Invoice date.</h5>
 
 
 
